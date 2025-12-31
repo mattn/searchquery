@@ -66,6 +66,61 @@ int main() {
 }
 ```
 
+### Token Lookup and Transformation
+
+You can provide a callback function to transform or filter tokens during parsing:
+
+```cpp
+#include <searchquery/base.hxx>
+#include <iostream>
+#include <map>
+
+using namespace searchquery;
+
+int main() {
+    std::string err;
+    
+    // Example 1: Alias replacement
+    std::map<std::string, std::string> aliases = {
+        {"x", "twitter"},
+        {"fb", "facebook"}
+    };
+    
+    auto alias_lookup = [&aliases](const std::string& token) -> std::string {
+        auto it = aliases.find(token);
+        return (it != aliases.end()) ? it->second : token;
+    };
+    
+    bool result = match_expression("I use twitter daily", "x", err, alias_lookup);
+    std::cout << result << std::endl; // true (x -> twitter)
+    
+    // Example 2: Stopword removal
+    std::map<std::string, bool> stopwords = {
+        {"the", true}, {"a", true}, {"an", true}
+    };
+    
+    auto stopword_filter = [&stopwords](const std::string& token) -> std::string {
+        return (stopwords.count(token) > 0) ? "" : token;
+    };
+    
+    result = match_expression("I have a cat and dog", "the cat dog", err, stopword_filter);
+    std::cout << result << std::endl; // true (the is removed)
+    
+    // Example 3: With database dialects
+    std::string query = searchquery::dialect::postgres::to_tsquery("x OR fb", alias_lookup);
+    std::cout << query << std::endl; // (twitter | facebook)
+    
+    return 0;
+}
+```
+
+**Use Cases:**
+- **Alias Resolution**: Map short aliases to full terms (e.g., "x" → "twitter")
+- **Stopword Removal**: Filter out common words by returning empty string
+- **Case Normalization**: Transform tokens to uppercase/lowercase
+- **Token Expansion**: Replace tokens with multiple terms
+- **Security Filtering**: Remove potentially harmful tokens
+
 ## Database Dialects
 
 Convert search queries to database-specific formats.

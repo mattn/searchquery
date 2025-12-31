@@ -1,5 +1,4 @@
 *.o
-searchquery
 compile_flags.txt
 example/sqlite/main.cxx
 example/sqlite/example_sqlite
