@@ -1,5 +1,4 @@
 *.o
-compile_flags.txt
 example/sqlite/example_sqlite
 example/sqlite/database.sqlite3
 example/postgres/example_postgres
