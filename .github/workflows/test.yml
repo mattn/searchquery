@@ -1,0 +1,19 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [g++, clang++]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build and test with ${{ matrix.compiler }}
+      run: |
+        make CXX=${{ matrix.compiler }} clean test
